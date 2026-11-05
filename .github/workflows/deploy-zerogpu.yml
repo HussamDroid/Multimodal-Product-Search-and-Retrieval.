@@ -1,0 +1,59 @@
+name: Deploy SouqLens to Hugging Face
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'deploy/zerogpu/**'
+      - 'pyproject.toml'
+      - '.github/workflows/deploy-zerogpu.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: souqlens-zerogpu-deployment
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      HF_SPACE_ID: ${{ vars.HF_SPACE_ID || 'Hussam07/souqlens' }}
+    steps:
+      - name: Check deployment secret
+        id: access
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          if [ -n "$HF_TOKEN" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Add HF_TOKEN under repository Settings > Secrets and variables > Actions to enable Space deployment."
+            if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+              exit 1
+            fi
+          fi
+      - uses: actions/checkout@v4
+        if: steps.access.outputs.enabled == 'true'
+      - uses: actions/setup-python@v5
+        if: steps.access.outputs.enabled == 'true'
+        with:
+          python-version: '3.12'
+      - name: Install source-staging dependencies
+        if: steps.access.outputs.enabled == 'true'
+        run: python -m pip install -e . 'huggingface_hub>=0.34,<3'
+      - name: Stage source without product data
+        if: steps.access.outputs.enabled == 'true'
+        run: python -m souqlens.cli stage-space --sdk zerogpu --output artifacts/space-source
+      - name: Upload to existing ZeroGPU Space
+        if: steps.access.outputs.enabled == 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python -m souqlens.cli publish-space --source artifacts/space-source --space-id "$HF_SPACE_ID" --source-commit "$GITHUB_SHA"

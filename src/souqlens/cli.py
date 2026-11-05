@@ -91,8 +91,15 @@ def main(argv=None):
     gradio.add_argument("--bundle", type=Path, required=True)
     gradio.add_argument("--host", default="127.0.0.1")
     gradio.add_argument("--port", type=int, default=7860)
+    publish = sub.add_parser("publish-space", help="Upload source to an existing ZeroGPU Space using HF_TOKEN")
+    publish.add_argument("--source", type=Path, required=True)
+    publish.add_argument("--space-id", default="Hussam07/souqlens")
+    publish.add_argument("--source-commit", default="local")
     args = parser.parse_args(argv)
-    if args.command == "serve-gradio":
+    if args.command == "publish-space":
+        from .publishing import publish_space
+        print(json.dumps(publish_space(args.source, args.space_id, args.source_commit), indent=2))
+    elif args.command == "serve-gradio":
         from .gradio_demo import create_demo, load_service
         service, directory = load_service("cpu", {"SOUQLENS_BUNDLE_DIR": str(args.bundle)})
         create_demo(service).queue(max_size=20).launch(server_name=args.host, server_port=args.port,

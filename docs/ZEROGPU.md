@@ -1,5 +1,7 @@
 # Free Gradio / ZeroGPU deployment
 
+For the existing `Hussam07/souqlens` Space, use [GITHUB_TO_SPACE.md](GITHUB_TO_SPACE.md) to publish the staged source through GitHub Actions after setting the deployment secret.
+
 The source includes a Gradio interface and a separate ZeroGPU entry point. The existing FastAPI and Docker options remain available.
 
 ## Eligibility first

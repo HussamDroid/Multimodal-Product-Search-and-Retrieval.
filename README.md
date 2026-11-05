@@ -16,6 +16,7 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 6. Real catalog importer | Excel/CSV mapping, HTML cleanup, barcode cover matching and an import review report |
 | 7. Hosting preparation | Checksummed real-data bundles, full-model Docker startup and source-only Space staging |
 | 8. Free-hosting adapter | Gradio demo, ZeroGPU callback and source-only staging for eligible personal accounts |
+| 9. GitHub-to-Space deployment | Secret-based source publishing to the existing Gradio/ZeroGPU Space, with SDK/hardware checks |
 
 The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 
@@ -138,6 +139,8 @@ The shipped sample has 12 fictional products, 18 example queries, synthetic imag
 ## API
 
 For a free portfolio deployment on an eligible Hugging Face personal account, follow [the Gradio / ZeroGPU guide](docs/ZEROGPU.md). Ordinary Docker/CPU Space creation has different account-plan requirements; verify that the free ZeroGPU option is available before creating a Space.
+
+The target Space is `Hussam07/souqlens`. Follow [the GitHub-to-Space setup](docs/GITHUB_TO_SPACE.md) to add the deployment secret and run the prepared workflow. Source publishing is not enabled until the secret is configured.
 
 For a Docker host, follow [the hosting guide](docs/HOSTING.md). Both routes use the same checksummed product bundle. Hosting still requires the real data and a selected account; no real-product deployment is live yet.
 
