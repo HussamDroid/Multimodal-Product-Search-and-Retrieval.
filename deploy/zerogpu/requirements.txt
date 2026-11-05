@@ -1,3 +1,6 @@
 spaces>=0.40,<1
 torch==2.8.0
--e .[ml,gradio]
+numpy>=1.26,<3
+Pillow>=10.4,<14
+sentence-transformers>=3.4,<6
+gradio==5.49.1

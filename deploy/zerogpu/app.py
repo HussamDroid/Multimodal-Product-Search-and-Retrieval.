@@ -2,6 +2,11 @@
 
 import spaces
 import os
+from pathlib import Path
+import sys
+
+# The Space installs dependencies before copying the application source.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
 from souqlens.gradio_demo import create_demo, load_service
 

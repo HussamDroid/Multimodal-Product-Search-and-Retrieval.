@@ -81,3 +81,5 @@ With an existing bundle and ML dependencies installed:
 ```
 
 Open http://127.0.0.1:7860. This uses CPU locally and does not need the `spaces` package or a Hugging Face subscription. It does not test ZeroGPU scheduling.
+
+The Gradio builder installs `requirements.txt` before copying application files. The Space requirements therefore list runtime dependencies directly; they must not use an editable project install. The entry point adds the staged `src` directory to the import path after importing `spaces`.
