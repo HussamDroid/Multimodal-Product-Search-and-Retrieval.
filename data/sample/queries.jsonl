@@ -1,0 +1,18 @@
+{"query_id": "jar-en", "text": "Glass storage jar", "language": "en", "modality": "text", "split": "train", "relevance": {"jar-1": 2, "jar-2": 2}}
+{"query_id": "jar-ar", "text": "برطمان تخزين زجاجي", "language": "ar", "modality": "text", "split": "train", "relevance": {"jar-1": 2, "jar-2": 2}}
+{"query_id": "jar-image", "image": "images/jar-query.jpg", "language": "none", "modality": "image", "split": "train", "relevance": {"jar-1": 2, "jar-2": 2}}
+{"query_id": "lamp-en", "text": "Table lamp", "language": "en", "modality": "text", "split": "train", "relevance": {"lamp-1": 2, "lamp-2": 2}}
+{"query_id": "lamp-ar", "text": "مصباح طاولة", "language": "ar", "modality": "text", "split": "train", "relevance": {"lamp-1": 2, "lamp-2": 2}}
+{"query_id": "lamp-image", "image": "images/lamp-query.jpg", "language": "none", "modality": "image", "split": "train", "relevance": {"lamp-1": 2, "lamp-2": 2}}
+{"query_id": "bag-en", "text": "Canvas backpack", "language": "en", "modality": "text", "split": "dev", "relevance": {"bag-1": 2, "bag-2": 2}}
+{"query_id": "bag-ar", "text": "حقيبة ظهر قماشية", "language": "ar", "modality": "text", "split": "dev", "relevance": {"bag-1": 2, "bag-2": 2}}
+{"query_id": "bag-image", "image": "images/bag-query.jpg", "language": "none", "modality": "image", "split": "dev", "relevance": {"bag-1": 2, "bag-2": 2}}
+{"query_id": "weights-en", "text": "Hex dumbbell", "language": "en", "modality": "text", "split": "dev", "relevance": {"weights-1": 2, "weights-2": 2}}
+{"query_id": "weights-ar", "text": "دمبل سداسي", "language": "ar", "modality": "text", "split": "dev", "relevance": {"weights-1": 2, "weights-2": 2}}
+{"query_id": "weights-image", "image": "images/weights-query.jpg", "language": "none", "modality": "image", "split": "dev", "relevance": {"weights-1": 2, "weights-2": 2}}
+{"query_id": "vase-en", "text": "Ceramic flower vase", "language": "en", "modality": "text", "split": "test", "relevance": {"vase-1": 2, "vase-2": 2}}
+{"query_id": "vase-ar", "text": "مزهرية سيراميك", "language": "ar", "modality": "text", "split": "test", "relevance": {"vase-1": 2, "vase-2": 2}}
+{"query_id": "vase-image", "image": "images/vase-query.jpg", "language": "none", "modality": "image", "split": "test", "relevance": {"vase-1": 2, "vase-2": 2}}
+{"query_id": "mug-en", "text": "Ceramic coffee mug", "language": "en", "modality": "text", "split": "test", "relevance": {"mug-1": 2, "mug-2": 2}}
+{"query_id": "mug-ar", "text": "كوب قهوة سيراميك", "language": "ar", "modality": "text", "split": "test", "relevance": {"mug-1": 2, "mug-2": 2}}
+{"query_id": "mug-image", "image": "images/mug-query.jpg", "language": "none", "modality": "image", "split": "test", "relevance": {"mug-1": 2, "mug-2": 2}}

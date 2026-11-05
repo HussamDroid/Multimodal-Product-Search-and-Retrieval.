@@ -1,0 +1,13 @@
+product_id,group_id,barcode,name_en,name_ar,description_en,description_ar,category,price,stock,image
+jar-1,jar,00100000,Small Glass storage jar,برطمان تخزين زجاجي صغير,transparent glass kitchen container with lid,وعاء مطبخ زجاجي شفاف مع غطاء,Kitchen,20,15,images/jar-1.jpg
+jar-2,jar,00100001,Large Glass storage jar,برطمان تخزين زجاجي كبير,transparent glass kitchen container with lid,وعاء مطبخ زجاجي شفاف مع غطاء,Kitchen,25,15,images/jar-2.jpg
+lamp-1,lamp,00100010,Small Table lamp,مصباح طاولة صغير,fabric shade bedside reading light,اضاءة جانبية للقراءة بجانب السرير,Lighting,32,15,images/lamp-1.jpg
+lamp-2,lamp,00100011,Large Table lamp,مصباح طاولة كبير,fabric shade bedside reading light,اضاءة جانبية للقراءة بجانب السرير,Lighting,37,0,images/lamp-2.jpg
+bag-1,bag,00100020,Small Canvas backpack,حقيبة ظهر قماشية صغير,school travel bag with shoulder straps,شنطة للسفر والمدرسة مع احزمة كتف,Bags,44,15,images/bag-1.jpg
+bag-2,bag,00100021,Large Canvas backpack,حقيبة ظهر قماشية كبير,school travel bag with shoulder straps,شنطة للسفر والمدرسة مع احزمة كتف,Bags,49,15,images/bag-2.jpg
+weights-1,weights,00100030,Small Hex dumbbell,دمبل سداسي صغير,strength training home gym exercise weight,اوزان تمارين القوة في المنزل,Fitness,56,15,images/weights-1.jpg
+weights-2,weights,00100031,Large Hex dumbbell,دمبل سداسي كبير,strength training home gym exercise weight,اوزان تمارين القوة في المنزل,Fitness,61,15,images/weights-2.jpg
+vase-1,vase,00100040,Small Ceramic flower vase,مزهرية سيراميك صغير,decorative flower holder for living room table,حامل زهور لتزيين طاولة غرفة المعيشة,Decor,68,15,images/vase-1.jpg
+vase-2,vase,00100041,Large Ceramic flower vase,مزهرية سيراميك كبير,decorative flower holder for living room table,حامل زهور لتزيين طاولة غرفة المعيشة,Decor,73,15,images/vase-2.jpg
+mug-1,mug,00100050,Small Ceramic coffee mug,كوب قهوة سيراميك صغير,drinking cup with handle for coffee and tea,كوب بمقبض لشرب القهوة والشاي,Kitchen,80,15,images/mug-1.jpg
+mug-2,mug,00100051,Large Ceramic coffee mug,كوب قهوة سيراميك كبير,drinking cup with handle for coffee and tea,كوب بمقبض لشرب القهوة والشاي,Kitchen,85,15,images/mug-2.jpg
