@@ -2,6 +2,7 @@
 
 from importlib.metadata import version
 from pathlib import Path
+import re
 from typing import Protocol
 
 import numpy as np
@@ -32,6 +33,13 @@ class ClipEncoder:
             from sentence_transformers import SentenceTransformer
         except ImportError as error:
             raise RuntimeError("Install model dependencies first: pip install -e '.[ml]'") from error
+        from huggingface_hub import HfApi
+        def pinned(model, revision):
+            if revision and re.fullmatch(r"[0-9a-f]{40}", revision):
+                return revision
+            return HfApi().model_info(model, revision=revision).sha
+        text_revision = pinned(TEXT_MODEL, text_revision)
+        image_revision = pinned(IMAGE_MODEL, image_revision)
         self._identity = {"backend": "multilingual-clip", "text_model": TEXT_MODEL,
                           "image_model": IMAGE_MODEL, "text_revision": text_revision,
                           "image_revision": image_revision,

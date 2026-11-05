@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 import math
 from pathlib import Path
 import time
+import threading
 
 import numpy as np
 
@@ -37,22 +38,26 @@ class SearchEngine:
     def __init__(self, products, index=None, encoder=None, encoder_factory=None):
         self.products, self.index = products, index
         self.encoder, self.encoder_factory = encoder, encoder_factory
+        self._encoder_lock = threading.Lock()
         self.lexical = BM25([p.text for p in products])
         if index and fingerprint(products) != index.metadata["catalog_sha256"]:
             raise ValueError("The catalog does not match the vector index; rebuild the index")
 
     def _encoder(self):
         if self.encoder is None:
-            if self.encoder_factory is None:
-                raise ValueError("No embedding encoder configured")
-            self.encoder = self.encoder_factory()
+            with self._encoder_lock:
+                if self.encoder is None:
+                    if self.encoder_factory is None:
+                        raise ValueError("No embedding encoder configured")
+                    self.encoder = self.encoder_factory()
         if self.encoder.identity != self.index.metadata["encoder"]:
             raise ValueError("Query encoder differs from the index encoder; rebuild or use matching revisions")
         return self.encoder
 
     def search(self, text="", image: Path | None = None, mode="hybrid", top_k=10,
-               candidate_k=50, filters: Filters | None = None, image_weight=0.65, ranker=None):
+               candidate_k=None, filters: Filters | None = None, image_weight=0.65, ranker=None):
         started = time.perf_counter()
+        candidate_k = max(50, top_k) if candidate_k is None else candidate_k
         text = text.strip()
         if mode not in {"bm25", "dense", "hybrid"}:
             raise ValueError("Mode must be bm25, dense or hybrid")
