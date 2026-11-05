@@ -65,6 +65,8 @@ def main():
         writer = csv.writer(file)
         writer.writerow(["product_id", "group_id", "barcode", "name_en", "name_ar", "description_en", "description_ar", "category", "price", "stock", "image"])
         writer.writerows(rows)
+    for query in queries:
+        query["relevance"] = {row[0]: query["relevance"].get(row[0], 0) for row in rows}
     (ROOT / "queries.jsonl").write_text("\n".join(json.dumps(q, ensure_ascii=False) for q in queries)+"\n", encoding="utf-8")
 
 
