@@ -12,8 +12,9 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 2. Multimodal retrieval | Aligned CLIP encoders, text/image/combined queries, versioned indexes and RRF fusion |
 | 3. Evaluation + learning | Group leakage checks, Recall/nDCG/MRR, query slices and pairwise linear reranking |
 | 4. API + demo | FastAPI endpoints, browser search interface, filters, bounded image uploads and Docker baseline |
+| 5. Real-model smoke verification | CPU model indexing, English/Arabic/image/combined retrieval, 120-pair reranker training and API inference |
 
-Pretrained encoder integration is implemented. The verification status below distinguishes tested components from model execution that still needs verification. No real-catalog quality or business-impact result is claimed.
+The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 
 ## Quick start — no model download
 
@@ -153,7 +154,8 @@ docker run --rm -p 127.0.0.1:8000:8000 souqlens
 - Unit/integration tests cover CSV validation, normalization, filters, vector checksums, encoder mismatch, image/text query paths, relevance metrics, split leakage, ranker training and API validation.
 - Tests use deterministic encoders for fast, download-free CI; this tests software behavior, not neural model accuracy.
 - A BM25 evaluation smoke run on the synthetic test queries completed successfully. Its perfect fixture scores are intentionally not presented as real-catalog performance.
-- Full pretrained inference and real-catalog evaluation are separate checks. Model execution status and environment notes are recorded in [docs/VERIFICATION.md](docs/VERIFICATION.md).
+- Real pretrained CPU indexing, English/Arabic/image/combined retrieval, a 120-pair trained reranker and API inference completed on the synthetic fixtures. Detailed results and limits are in [docs/VERIFICATION.md](docs/VERIFICATION.md).
+- Real-catalog evaluation, visual browser QA and a Docker build remain unverified.
 
 ## Repository layout
 

@@ -1,0 +1,161 @@
+{
+  "dataset": "12 synthetic product fixtures; illustrative judgments; not a real-catalog benchmark",
+  "environment": {
+    "python": "3.12.14",
+    "device": "cpu"
+  },
+  "encoder": {
+    "backend": "multilingual-clip",
+    "text_model": "sentence-transformers/clip-ViT-B-32-multilingual-v1",
+    "image_model": "sentence-transformers/clip-ViT-B-32",
+    "text_revision": "58edf8cada9e398793dca955574a48cbb7f18be2",
+    "image_revision": "327ab6726d33c0e22f920c83f2ff9e4bd38ca37f",
+    "sentence_transformers": "5.7.0"
+  },
+  "catalog_sha256": "9789c87679481504ae8beef337646f65534712d4e04ebfefcd47dc217f16818c",
+  "test_queries": 6,
+  "summary": {
+    "bm25": {
+      "overall": {
+        "queries": 4,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 0.12161000006472023,
+        "latency_p95_ms": 0.15891965008449915
+      },
+      "en/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 0.12006250005924812,
+        "latency_p95_ms": 0.12487075006220039
+      },
+      "ar/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 0.1413245000776442,
+        "latency_p95_ms": 0.16248305008730313
+      }
+    },
+    "dense": {
+      "overall": {
+        "queries": 6,
+        "recall@5": 1.0,
+        "ndcg@5": 0.9795358858896749,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 20.12769750001553,
+        "latency_p95_ms": 89.49800825007515
+      },
+      "en/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 19.435617499993896,
+        "latency_p95_ms": 20.098035049977625
+      },
+      "ar/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 0.9386076576690247,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 19.04642650004007,
+        "latency_p95_ms": 19.980024850053724
+      },
+      "none/image": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 86.64416550004717,
+        "latency_p95_ms": 91.78108245009753
+      }
+    },
+    "hybrid": {
+      "overall": {
+        "queries": 6,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 17.918831999963913,
+        "latency_p95_ms": 67.27286799991816
+      },
+      "en/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 17.060386500020286,
+        "latency_p95_ms": 18.052625249936227
+      },
+      "ar/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 17.197658499981117,
+        "latency_p95_ms": 17.627076849998957
+      },
+      "none/image": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 66.26781999989362,
+        "latency_p95_ms": 68.0769063999378
+      }
+    },
+    "hybrid+reranker": {
+      "overall": {
+        "queries": 6,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 29.019477500014546,
+        "latency_p95_ms": 57.14792374993749
+      },
+      "en/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 29.019477500014546,
+        "latency_p95_ms": 29.22103384996717
+      },
+      "ar/text": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 16.30269899999348,
+        "latency_p95_ms": 16.618004099962036
+      },
+      "none/image": {
+        "queries": 2,
+        "recall@5": 1.0,
+        "ndcg@5": 1.0,
+        "mrr@5": 1.0,
+        "latency_p50_ms": 55.97686749990771,
+        "latency_p95_ms": 58.08476874996131
+      }
+    }
+  },
+  "training_pairs": 120,
+  "training_query_ids": [
+    "jar-en",
+    "jar-ar",
+    "jar-image",
+    "lamp-en",
+    "lamp-ar",
+    "lamp-image"
+  ],
+  "combined_query_top3": [
+    "jar-1",
+    "jar-2",
+    "mug-1"
+  ]
+}

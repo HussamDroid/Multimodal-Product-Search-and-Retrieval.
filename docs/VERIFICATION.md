@@ -10,7 +10,18 @@
 
 ## Model execution
 
-Pretrained model download and inference verification is in progress. A successful model run must be recorded separately before describing semantic retrieval as execution-verified.
+Both pretrained encoders loaded successfully on CPU and built an index for the 12-product synthetic catalog. The index records these resolved model revisions:
+
+- Multilingual text: `58edf8cada9e398793dca955574a48cbb7f18be2`
+- CLIP image: `327ab6726d33c0e22f920c83f2ff9e4bd38ca37f`
+
+Dense and hybrid retrieval completed on six synthetic test queries: two English, two Arabic and two image-only. BM25 completed on the four supported text queries. A pairwise reranker trained on 120 explicit preference pairs from six train-split queries; held-out evaluation then completed with the trained model. The combined reference-photo/text query ranked `jar-1` and `jar-2` first and second.
+
+The measured fixture results, model revisions and training query IDs are recorded in [fixture-smoke-results.json](fixture-smoke-results.json). These are synthetic smoke checks, not estimates of real-catalog performance. The tiny fixture does not show that reranking improves search; several methods already saturate its metrics.
+
+The real encoders were also exercised through the API: English and Arabic hybrid queries with reranking, a combined image/text request, product-image serving and the model-loaded health state. All passed.
+
+The demo JavaScript passed a syntax check. Visual browser QA and a Docker image build have not been performed. GitHub Actions completed successfully for checkpoints 1 through 4; CI intentionally uses download-free test encoders.
 
 ## Development environment
 
