@@ -131,7 +131,9 @@ def prepare_catalog(source: Path, output: Path, image_root: Path, mapping=None, 
         if item["barcode"]:
             candidate = resolve_image(image_root, item["barcode"]+"/1.jpg")
             if candidate.parent.is_dir():
-                image = next((p for p in candidate.parent.iterdir()
+                priority = {"1.jpg": 0, "1.jpeg": 1, "1.png": 2, "1.webp": 3}
+                image = next((p for p in sorted(candidate.parent.iterdir(),
+                              key=lambda p: (priority.get(p.name.casefold(), 9), p.name))
                               if p.is_file() and p.name.casefold() in {"1.jpg", "1.jpeg", "1.png", "1.webp"}), None)
         if image is None and item["image"] and not re.match(r"^[a-z]+://", item["image"], re.I):
             try:

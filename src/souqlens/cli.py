@@ -78,8 +78,22 @@ def main(argv=None):
     prepare.add_argument("--image-root", type=Path, required=True)
     prepare.add_argument("--mapping", type=Path)
     prepare.add_argument("--sheet")
+    bundle = sub.add_parser("export-bundle", help="Package a validated index and its images for hosting")
+    bundle.add_argument("--index", type=Path, required=True)
+    bundle.add_argument("--image-root", type=Path, required=True)
+    bundle.add_argument("--output", type=Path, required=True)
+    bundle.add_argument("--ranker", type=Path)
+    stage = sub.add_parser("stage-space", help="Prepare source files for a Docker Space without copying private data")
+    stage.add_argument("--repo-root", type=Path, default=Path("."))
+    stage.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
-    if args.command == "prepare-catalog":
+    if args.command == "stage-space":
+        from .hosting import stage_space
+        print(json.dumps(stage_space(args.repo_root, args.output), indent=2))
+    elif args.command == "export-bundle":
+        from .hosting import export_bundle
+        print(json.dumps(export_bundle(args.index, args.image_root, args.output, args.ranker), indent=2))
+    elif args.command == "prepare-catalog":
         from .importer import prepare_catalog
         mapping = json.loads(args.mapping.read_text(encoding="utf-8")) if args.mapping else None
         print(json.dumps(prepare_catalog(args.source, args.output, args.image_root, mapping, args.sheet),

@@ -14,6 +14,7 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 4. API + demo | FastAPI endpoints, browser search interface, filters, bounded image uploads and Docker baseline |
 | 5. Real-model smoke verification | CPU model indexing, English/Arabic/image/combined retrieval, 120-pair reranker training and API inference |
 | 6. Real catalog importer | Excel/CSV mapping, HTML cleanup, barcode cover matching and an import review report |
+| 7. Hosting preparation | Checksummed real-data bundles, full-model Docker startup and source-only Space staging |
 
 The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 
@@ -134,6 +135,8 @@ The CSV schema is shown in [data/sample/catalog.csv](data/sample/catalog.csv). R
 The shipped sample has 12 fictional products, 18 example queries, synthetic images and illustrative relevance labels. Regenerate it with `python scripts/make_sample.py`. Synthetic images are not a substitute for independent customer photos in model evaluation.
 
 ## API
+
+For cloud hosting, follow [the hosting guide](docs/HOSTING.md). It covers copying the actual catalog images into a portable bundle and deploying the full-model container. Hosting still requires the real data and a selected account; no real-product deployment is live yet.
 
 | Endpoint | Purpose |
 | --- | --- |
