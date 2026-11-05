@@ -13,6 +13,7 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 3. Evaluation + learning | Group leakage checks, Recall/nDCG/MRR, query slices and pairwise linear reranking |
 | 4. API + demo | FastAPI endpoints, browser search interface, filters, bounded image uploads and Docker baseline |
 | 5. Real-model smoke verification | CPU model indexing, English/Arabic/image/combined retrieval, 120-pair reranker training and API inference |
+| 6. Real catalog importer | Excel/CSV mapping, HTML cleanup, barcode cover matching and an import review report |
 
 The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 
@@ -118,6 +119,8 @@ Output paths must be new. This keeps experiment artifacts from being overwritten
 Variant families cannot be relevant in multiple query splits. Training uses train judgments only and does not assume unjudged products are negative. The evaluator checks reranker training-family overlap with held-out queries. See [the evaluation protocol](docs/EVALUATION.md) for labeling guidance and limitations.
 
 ## Bring a real catalog
+
+Use the [real catalog import guide](docs/REAL_CATALOG.md) to convert an existing Excel/CSV master and match your barcode folders. This includes Windows shared-drive commands and optional explicit column mappings.
 
 The CSV schema is shown in [data/sample/catalog.csv](data/sample/catalog.csv). Required fields are `product_id`, `group_id`, `name_en`, `price` and `stock`. English/Arabic descriptions, Arabic names, category, barcode and image path are supported.
 

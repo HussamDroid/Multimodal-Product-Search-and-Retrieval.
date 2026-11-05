@@ -72,8 +72,19 @@ def main(argv=None):
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=8000)
     serve.add_argument("--device", default="cpu")
+    prepare = sub.add_parser("prepare-catalog", help="Convert an Excel/CSV master export and match barcode cover images")
+    prepare.add_argument("--source", type=Path, required=True)
+    prepare.add_argument("--output", type=Path, required=True)
+    prepare.add_argument("--image-root", type=Path, required=True)
+    prepare.add_argument("--mapping", type=Path)
+    prepare.add_argument("--sheet")
     args = parser.parse_args(argv)
-    if args.command == "baseline":
+    if args.command == "prepare-catalog":
+        from .importer import prepare_catalog
+        mapping = json.loads(args.mapping.read_text(encoding="utf-8")) if args.mapping else None
+        print(json.dumps(prepare_catalog(args.source, args.output, args.image_root, mapping, args.sheet),
+                         ensure_ascii=False, indent=2))
+    elif args.command == "baseline":
         if not args.query.strip() or not 1 <= args.top_k <= 100:
             parser.error("Provide a query and a top-k between 1 and 100")
         products = load_catalog(args.catalog)
