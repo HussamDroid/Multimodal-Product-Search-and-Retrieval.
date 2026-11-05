@@ -20,7 +20,7 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       HF_SPACE_ID: ${{ vars.HF_SPACE_ID || 'Hussam07/souqlens' }}
     steps:
@@ -52,8 +52,8 @@ jobs:
       - name: Stage source without product data
         if: steps.access.outputs.enabled == 'true'
         run: python -m souqlens.cli stage-space --sdk zerogpu --output artifacts/space-source
-      - name: Upload to existing ZeroGPU Space
+      - name: Upload and verify ZeroGPU Space startup
         if: steps.access.outputs.enabled == 'true'
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python -m souqlens.cli publish-space --source artifacts/space-source --space-id "$HF_SPACE_ID" --source-commit "$GITHUB_SHA"
+        run: python -m souqlens.cli publish-space --source artifacts/space-source --space-id "$HF_SPACE_ID" --source-commit "$GITHUB_SHA" --wait

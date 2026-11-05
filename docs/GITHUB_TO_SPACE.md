@@ -17,7 +17,7 @@ The workflow stages only the Gradio source, checks the existing SDK/hardware and
 
 ## After upload
 
-The workflow reports a Space commit hash once the source is uploaded. That is not proof that the hosted build or GPU inference succeeded. Open the Space's build/runtime logs and wait for the app to become ready.
+The workflow reports a Space commit hash once the source is uploaded, then waits up to ten minutes for that exact commit to reach `RUNNING`. Build/runtime failures, paused states, a changed source commit or a timeout fail the workflow. A running setup screen is not proof of model inference: test queries after configuring the real catalog.
 
 Until the real-catalog dataset is configured, the app intentionally displays **Catalog not configured** and disables search. Follow [ZEROGPU.md](ZEROGPU.md) to connect the checksummed product bundle using Space variables and a separate read-scoped dataset token. The GitHub deployment token does not need access to product datasets.
 
@@ -25,7 +25,7 @@ Until the real-catalog dataset is configured, the app intentionally displays **C
 
 After `HF_TOKEN` is added, relevant pushes to `main` trigger the source deployment workflow. Before the secret is configured, push-triggered runs skip uploading and show a notice. A manually requested run without the secret fails with an explanation.
 
-Deployment was not executed from this workspace because the required account credential is not configured. Publisher tests cover SDK validation, hardware validation, the source allowlist and parent-commit guard. Live Space build and ZeroGPU inference still need verification after the workflow runs.
+The first manually triggered source upload completed successfully through GitHub Actions. Runtime verification was then added to check private Space startup using the existing secret. Publisher tests cover SDK/hardware validation, the source allowlist, parent-commit guard, startup states and bounded timeouts. No credential value is read by the agent or included in source. Real-catalog ZeroGPU inference still needs verification after a product bundle is supplied.
 
 Official references:
 

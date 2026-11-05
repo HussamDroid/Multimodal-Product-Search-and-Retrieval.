@@ -95,10 +95,13 @@ def main(argv=None):
     publish.add_argument("--source", type=Path, required=True)
     publish.add_argument("--space-id", default="Hussam07/souqlens")
     publish.add_argument("--source-commit", default="local")
+    publish.add_argument("--wait", action="store_true")
+    publish.add_argument("--timeout", type=int, default=600)
     args = parser.parse_args(argv)
     if args.command == "publish-space":
         from .publishing import publish_space
-        print(json.dumps(publish_space(args.source, args.space_id, args.source_commit), indent=2))
+        print(json.dumps(publish_space(args.source, args.space_id, args.source_commit,
+                                       wait=args.wait, timeout=args.timeout), indent=2))
     elif args.command == "serve-gradio":
         from .gradio_demo import create_demo, load_service
         service, directory = load_service("cpu", {"SOUQLENS_BUNDLE_DIR": str(args.bundle)})

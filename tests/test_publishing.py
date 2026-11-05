@@ -3,7 +3,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from souqlens.publishing import publish_space
+from souqlens.publishing import publish_space, wait_for_space
 
 
 class FakeHub:
@@ -23,6 +23,37 @@ class FakeHub:
 
 
 class PublishingTests(unittest.TestCase):
+    def runtime_api(self, stages, commit="expected"):
+        class RuntimeHub:
+            def __init__(self):
+                self.stages=iter(stages)
+            def space_info(self, repo_id):
+                return SimpleNamespace(sha=commit)
+            def get_space_runtime(self, repo_id):
+                return SimpleNamespace(stage=next(self.stages))
+        return RuntimeHub()
+
+    def test_runtime_verification_waits_for_running(self):
+        ticks=[0]
+        result=wait_for_space("Hussam07/souqlens","expected",api=self.runtime_api(["BUILDING","STARTING","RUNNING"]),
+            clock=lambda:ticks[0],sleeper=lambda seconds:ticks.__setitem__(0,ticks[0]+seconds))
+        self.assertEqual(result["status"],"running")
+        self.assertEqual(ticks[0],20)
+
+    def test_runtime_failure_and_changed_source_are_reported(self):
+        with self.assertRaisesRegex(RuntimeError,"RUNTIME_ERROR"):
+            wait_for_space("Hussam07/souqlens","expected",api=self.runtime_api(["RUNTIME_ERROR"]))
+        with self.assertRaisesRegex(RuntimeError,"source changed"):
+            wait_for_space("Hussam07/souqlens","expected",api=self.runtime_api(["RUNNING"],"other"))
+
+    def test_runtime_timeout_is_bounded(self):
+        ticks=[0]
+        with self.assertRaisesRegex(RuntimeError,"last stage: BUILDING"):
+            wait_for_space("Hussam07/souqlens","expected",timeout=5,interval=10,
+                api=self.runtime_api(["BUILDING","BUILDING"]),clock=lambda:ticks[0],
+                sleeper=lambda seconds:ticks.__setitem__(0,ticks[0]+seconds))
+        self.assertEqual(ticks[0],5)
+
     def stage(self, root):
         for name in ["app.py", "README.md", "requirements.txt", "pyproject.toml", "src/souqlens/api.py"]:
             path=root/name;path.parent.mkdir(parents=True,exist_ok=True)
