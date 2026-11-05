@@ -15,6 +15,7 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 5. Real-model smoke verification | CPU model indexing, English/Arabic/image/combined retrieval, 120-pair reranker training and API inference |
 | 6. Real catalog importer | Excel/CSV mapping, HTML cleanup, barcode cover matching and an import review report |
 | 7. Hosting preparation | Checksummed real-data bundles, full-model Docker startup and source-only Space staging |
+| 8. Free-hosting adapter | Gradio demo, ZeroGPU callback and source-only staging for eligible personal accounts |
 
 The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 
@@ -136,7 +137,9 @@ The shipped sample has 12 fictional products, 18 example queries, synthetic imag
 
 ## API
 
-For cloud hosting, follow [the hosting guide](docs/HOSTING.md). It covers copying the actual catalog images into a portable bundle and deploying the full-model container. Hosting still requires the real data and a selected account; no real-product deployment is live yet.
+For a free portfolio deployment on an eligible Hugging Face personal account, follow [the Gradio / ZeroGPU guide](docs/ZEROGPU.md). Ordinary Docker/CPU Space creation has different account-plan requirements; verify that the free ZeroGPU option is available before creating a Space.
+
+For a Docker host, follow [the hosting guide](docs/HOSTING.md). Both routes use the same checksummed product bundle. Hosting still requires the real data and a selected account; no real-product deployment is live yet.
 
 | Endpoint | Purpose |
 | --- | --- |

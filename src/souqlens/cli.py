@@ -86,10 +86,22 @@ def main(argv=None):
     stage = sub.add_parser("stage-space", help="Prepare source files for a Docker Space without copying private data")
     stage.add_argument("--repo-root", type=Path, default=Path("."))
     stage.add_argument("--output", type=Path, required=True)
+    stage.add_argument("--sdk", choices=["docker", "zerogpu"], default="docker")
+    gradio = sub.add_parser("serve-gradio", help="Test the Gradio interface locally on CPU")
+    gradio.add_argument("--bundle", type=Path, required=True)
+    gradio.add_argument("--host", default="127.0.0.1")
+    gradio.add_argument("--port", type=int, default=7860)
     args = parser.parse_args(argv)
-    if args.command == "stage-space":
+    if args.command == "serve-gradio":
+        from .gradio_demo import create_demo, load_service
+        service, directory = load_service("cpu", {"SOUQLENS_BUNDLE_DIR": str(args.bundle)})
+        create_demo(service).queue(max_size=20).launch(server_name=args.host, server_port=args.port,
+            allowed_paths=[str((directory/"images").resolve())],
+            blocked_paths=[str((directory/name).resolve()) for name in ["index", "bundle.json", "ranker.json"]],
+            max_file_size="10mb", show_error=False)
+    elif args.command == "stage-space":
         from .hosting import stage_space
-        print(json.dumps(stage_space(args.repo_root, args.output), indent=2))
+        print(json.dumps(stage_space(args.repo_root, args.output, args.sdk), indent=2))
     elif args.command == "export-bundle":
         from .hosting import export_bundle
         print(json.dumps(export_bundle(args.index, args.image_root, args.output, args.ranker), indent=2))

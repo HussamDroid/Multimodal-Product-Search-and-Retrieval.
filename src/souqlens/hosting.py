@@ -91,12 +91,17 @@ def validate_bundle(directory: Path):
     return manifest
 
 
-def stage_space(repo_root: Path, output: Path):
+def stage_space(repo_root: Path, output: Path, sdk="docker"):
     if output.exists():
         raise ValueError("Space source output already exists")
-    required = {"pyproject.toml": repo_root/"pyproject.toml",
-                "Dockerfile": repo_root/"deploy/Dockerfile",
-                "README.md": repo_root/"deploy/README.md"}
+    if sdk not in {"docker", "zerogpu"}:
+        raise ValueError("SDK must be docker or zerogpu")
+    required = {"pyproject.toml": repo_root/"pyproject.toml"}
+    if sdk == "zerogpu":
+        required.update({name: repo_root/"deploy/zerogpu"/name
+                         for name in ["app.py", "README.md", "requirements.txt"]})
+    else:
+        required.update({"Dockerfile": repo_root/"deploy/Dockerfile", "README.md": repo_root/"deploy/README.md"})
     if not all(path.is_file() for path in required.values()) or not (repo_root/"src/souqlens").is_dir():
         raise ValueError("Run from the SouqLens repository or provide --repo-root")
     if output.resolve().is_relative_to((repo_root/"src").resolve()):
@@ -118,19 +123,25 @@ def stage_space(repo_root: Path, output: Path):
     return {"output": str(output), "note": "Source only; no catalogs, indexes or images were copied"}
 
 
-def main():
-    logging.basicConfig(level=logging.INFO)
-    bundle_dir = os.environ.get("SOUQLENS_BUNDLE_DIR")
-    dataset_id = os.environ.get("SOUQLENS_DATASET_ID")
+def resolve_bundle_directory(environ=None):
+    environ = os.environ if environ is None else environ
+    bundle_dir = environ.get("SOUQLENS_BUNDLE_DIR")
+    dataset_id = environ.get("SOUQLENS_DATASET_ID")
     if bundle_dir:
         directory = Path(bundle_dir)
     elif dataset_id:
         from huggingface_hub import snapshot_download
         directory = Path(snapshot_download(repo_id=dataset_id, repo_type="dataset",
-            revision=os.environ.get("SOUQLENS_DATASET_REVISION"),
+            revision=environ.get("SOUQLENS_DATASET_REVISION"),
             local_dir=tempfile.mkdtemp(prefix="souqlens-dataset-")))
     else:
         raise RuntimeError("Configure SOUQLENS_BUNDLE_DIR or SOUQLENS_DATASET_ID; no sample fallback is enabled")
+    return directory
+
+
+def main():
+    logging.basicConfig(level=logging.INFO)
+    directory = resolve_bundle_directory()
     manifest = validate_bundle(directory)
     from .cli import indexed_engine
     from .api import create_app

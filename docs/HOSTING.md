@@ -1,5 +1,7 @@
 # Host a real catalog
 
+For the free-account ZeroGPU route, use [ZEROGPU.md](ZEROGPU.md). The Docker instructions below are a separate deployment path and do not establish ZeroGPU eligibility.
+
 The hosted service needs a prepared catalog bundle plus the application source. A Windows drive path such as `Z:\Mini Mall\Mini-Mall-Images` is local to the office and cannot be used directly by a cloud server.
 
 The full-model container is `deploy/Dockerfile`. The root Dockerfile remains the lightweight BM25 sample demo. The hosted container loads models before accepting requests and refuses to start without an explicit bundle. It does not silently substitute synthetic products.
