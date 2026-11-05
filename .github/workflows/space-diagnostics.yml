@@ -1,0 +1,45 @@
+name: Check Hugging Face build logs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/space-diagnostics.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'huggingface_hub>=1.27,<3'
+      - name: Read current Space state and recent build logs
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_SPACE_ID: ${{ vars.HF_SPACE_ID || 'Hussam07/souqlens' }}
+        run: |
+          python - <<'PY'
+          from collections import deque
+          import json, os, re
+          from huggingface_hub import HfApi
+          token = os.environ.get('HF_TOKEN')
+          if not token:
+              raise RuntimeError('HF_TOKEN is not configured')
+          api = HfApi(token=token)
+          space_id = os.environ['HF_SPACE_ID']
+          runtime = api.get_space_runtime(space_id)
+          stage = str(getattr(runtime.stage, 'value', runtime.stage))
+          print(json.dumps({'space_id': space_id, 'stage': stage}))
+          lines = deque(api.fetch_space_logs(repo_id=space_id, build=True, follow=False), maxlen=120)
+          print('Recent build logs:')
+          for line in lines:
+              clean = str(line).replace(token, '[REDACTED]')
+              clean = re.sub(r'hf_[A-Za-z0-9]{10,}', '[REDACTED]', clean)
+              print(clean, end='' if clean.endswith('\n') else '\n')
+          PY

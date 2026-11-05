@@ -23,6 +23,8 @@ Until the real-catalog dataset is configured, the app intentionally displays **C
 
 ## Future checkpoints
 
+If startup verification reports a build error, the **Check Hugging Face build logs** workflow reads recent build output using the same scoped secret. It does not change the Space, hardware or source. Hugging Face token values are redacted before the diagnostic output is printed.
+
 After `HF_TOKEN` is added, relevant pushes to `main` trigger the source deployment workflow. Before the secret is configured, push-triggered runs skip uploading and show a notice. A manually requested run without the secret fails with an explanation.
 
 The first manually triggered source upload completed successfully through GitHub Actions. Runtime verification was then added to check private Space startup using the existing secret. Publisher tests cover SDK/hardware validation, the source allowlist, parent-commit guard, startup states and bounded timeouts. No credential value is read by the agent or included in source. Real-catalog ZeroGPU inference still needs verification after a product bundle is supplied.
