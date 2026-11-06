@@ -55,7 +55,7 @@ The staged directory contains `app.py`, `README.md`, `requirements.txt`, `pyproj
 | `SOUQLENS_DATASET_REVISION` | Variable | Exact dataset commit hash |
 | `HF_TOKEN` | Secret | Read-scoped access to the private dataset |
 
-Enter the token in the provider's secret settings, not source code or chat. The account and product files have not been supplied to this workspace, so no Space or dataset has been created by this checkpoint.
+Enter the token in the provider's secret settings, not source code or chat. The owner has created the SouqLens Space and private Black Rose dataset. Source updates are published through GitHub Actions; catalog bundle updates require a separate dataset upload and pinned revision.
 
 6. Wait for the build and model loading. Test English, Arabic, image-only and combined queries. Compare keyword/dense/hybrid methods and verify price and availability filters. A URL or successful source upload alone is not proof that GPU inference works.
 

@@ -22,6 +22,7 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 12. Space build packaging | Explicit runtime dependencies and source-path bootstrap support the hosted build order |
 | 13. OpenCart real-data adapter | Image-backed subset selection, barcode IDs, explicit duplicate policy and row-level conflict reporting |
 | 14. Inclusive demo defaults | Price controls initially span the full catalog so the first search does not exclude paid products |
+| 15. Multilingual retrieval comparison | Optional E5 text tower alongside CLIP photos, versioned indexes, fixed-query comparisons and explicit judgment review status |
 
 The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 
@@ -185,3 +186,7 @@ docs/           evaluation protocol and verification notes
 ```
 
 Large model weights, indexes, trained artifacts, private data and credentials are excluded from Git. Dependency ranges define supported installation inputs; use `pip freeze` and pinned model revisions to capture a specific experiment environment.
+
+The multilingual text experiment and its evaluation limits are documented in [TEXT_RETRIEVAL.md](docs/TEXT_RETRIEVAL.md). Real catalog data, draft judgments and detailed results stay in the private deployment bundle.
+
+The draft 18-product comparison contains 32 English/Arabic queries (12 development and 20 test-labelled). On its 10 Arabic test-labelled queries, the E5-base candidate raises hybrid Recall@3 from 0.70 to 1.00 and first-place hits from 4 to 6. Labels await owner review, model selection was exploratory, and no independent benchmark or customer-impact claim is made. The original CLIP photo path is retained.

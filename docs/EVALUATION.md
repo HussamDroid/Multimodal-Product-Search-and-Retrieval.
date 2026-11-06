@@ -23,7 +23,7 @@ Image queries use `image`, relative to `--image-root`; combined queries include 
 
 - Compare BM25, dense, hybrid and hybrid + reranker on the same text-query subset.
 - Report image-only and combined-query results separately. BM25 does not support those queries; the evaluator lists them as unsupported.
-- Report macro Recall@K, nDCG@K, MRR@K and query counts per English/Arabic/modality slice.
+- Report Hit@1, macro Recall@K, nDCG@K, MRR@K and query counts per English/Arabic/modality slice.
 - Latency includes query encoding and excludes one initial warm-up query. First-query latency is reported separately. Always record CPU/GPU, model revisions, corpus size and request concurrency alongside performance results.
 - Scores are ranking functions, not purchase likelihoods or calibrated confidence.
 - Unjudged predictions receive zero relevance in evaluation. Incomplete pools can bias comparisons, so expand judgments when a new method retrieves new candidates.
@@ -40,3 +40,5 @@ Training retrieves up to 100 candidates per query. If a relevant product is abse
 ## Next model experiment
 
 Once the baseline has a real judged dataset, mine difficult nonmatches among similar variants and train an embedding adapter or fine-tune with a contrastive objective. Keep all images and near-duplicate variants of each family in the same split. Record the unchanged pretrained baseline, trained configuration, seeds, dataset fingerprints and held-out metrics. Do not add encoder training merely to increase the project feature count.
+
+For the optional E5 text tower and the draft Black Rose regression comparison, see [TEXT_RETRIEVAL.md](TEXT_RETRIEVAL.md). Query records may include `judgment_status` (`draft`, `reviewed` or `unspecified`); reports expose counts so provisional labels remain visible.

@@ -24,6 +24,8 @@ def load_queries(path: Path, products):
         qid, split = query.get("query_id"), query.get("split")
         if not qid or qid in ids or split not in {"train", "dev", "test"}:
             raise ValueError(f"Query line {line}: need unique ID and train/dev/test split")
+        if query.get("judgment_status", "unspecified") not in {"draft", "reviewed", "unspecified"}:
+            raise ValueError(f"Query {qid}: invalid judgment review status")
         ids.add(qid)
         if not query.get("text", "").strip() and not query.get("image"):
             raise ValueError(f"Query {qid}: no query text or image")
@@ -61,7 +63,7 @@ def metrics(predicted, relevance, k):
     dcg = sum((2**grade-1)/math.log2(i+2) for i, grade in enumerate(gains))
     ideal = sorted(relevance.values(), reverse=True)[:k]
     idcg = sum((2**grade-1)/math.log2(i+2) for i, grade in enumerate(ideal))
-    return {f"recall@{k}": len(set(ranked) & relevant)/len(relevant),
+    return {"hit@1": float(bool(ranked) and ranked[0] in relevant), f"recall@{k}": len(set(ranked) & relevant)/len(relevant),
             f"ndcg@{k}": dcg/idcg if idcg else 0.0,
             f"mrr@{k}": next((1/(i+1) for i, pid in enumerate(ranked) if pid in relevant), 0.0)}
 
@@ -99,7 +101,7 @@ def evaluate(engine, queries, *, image_root, mode="bm25", split="test", k=5, ran
     summary = {}
     for name, values in slices.items():
         summary[name] = {"queries": len(values), **{key: float(np.mean([v[key] for v in values]))
-                        for key in (f"recall@{k}", f"ndcg@{k}", f"mrr@{k}")},
+                        for key in ("hit@1", f"recall@{k}", f"ndcg@{k}", f"mrr@{k}")},
                         "latency_p50_ms": float(np.percentile([v["latency_ms"] for v in values], 50)),
                         "latency_p95_ms": float(np.percentile([v["latency_ms"] for v in values], 95))}
     return {"created_at": datetime.now(timezone.utc).isoformat(), "mode": mode,
@@ -108,8 +110,10 @@ def evaluate(engine, queries, *, image_root, mode="bm25", split="test", k=5, ran
             "queries_sha256": hashlib.sha256(json.dumps(queries, sort_keys=True, ensure_ascii=False).encode()).hexdigest(),
             "encoder": engine.index.metadata["encoder"] if engine.index and mode != "bm25" else None,
             "cold_start_first_query_ms": cold_start,
+            "judgment_review": {status: sum(q.get("judgment_status", "unspecified") == status for q in supported)
+                                for status in ("draft", "reviewed", "unspecified")},
             "unsupported_queries": [q["query_id"] for q in selected if q not in supported],
             "summary": summary, "per_query": rows,
             "notes": ["Latency excludes an initial warm-up query and includes query encoding.",
                       "Unjudged results count as zero relevance; label the evaluation pool carefully.",
-                      "Synthetic fixture results are pipeline checks, not real catalog accuracy."]}
+                      "Draft and synthetic judgments are regression checks, not independently reviewed catalog accuracy."]}

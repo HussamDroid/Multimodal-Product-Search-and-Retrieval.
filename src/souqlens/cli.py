@@ -9,13 +9,15 @@ from .lexical import BM25
 
 
 def indexed_engine(path, device="cpu"):
-    from .encoders import ClipEncoder
+    from .encoders import ClipEncoder, SEMANTIC_MODEL
     from .index import VectorIndex
     from .search import SearchEngine
     index = VectorIndex.load(path)
     meta = index.metadata["encoder"]
     return SearchEngine(index.products, index=index, encoder_factory=lambda: ClipEncoder(
-        device=device, text_revision=meta["text_revision"], image_revision=meta["image_revision"]))
+        device=device, text_revision=meta["text_revision"], image_revision=meta["image_revision"],
+        semantic_text=bool(meta.get("semantic_model")), semantic_revision=meta.get("semantic_revision"),
+        semantic_model=meta.get("semantic_model", SEMANTIC_MODEL)))
 
 
 def main(argv=None):
@@ -32,6 +34,10 @@ def main(argv=None):
     build.add_argument("--device", default="cpu")
     build.add_argument("--text-revision")
     build.add_argument("--image-revision")
+    build.add_argument("--semantic-text", action="store_true", help="Add multilingual E5 text retrieval; retain CLIP for photos")
+    build.add_argument("--semantic-revision")
+    build.add_argument("--semantic-model", choices=["intfloat/multilingual-e5-small", "intfloat/multilingual-e5-base"],
+                       default="intfloat/multilingual-e5-small")
     dense = sub.add_parser("search", help="Search an existing vector index")
     dense.add_argument("--index", type=Path, required=True)
     dense.add_argument("--query", default="")
@@ -44,6 +50,14 @@ def main(argv=None):
     dense.add_argument("--category")
     dense.add_argument("--device", default="cpu")
     dense.add_argument("--ranker", type=Path)
+    compare = sub.add_parser("compare", help="Compare BM25, dense and hybrid on fixed text-query splits")
+    compare.add_argument("--index", type=Path, action="append", required=True)
+    compare.add_argument("--queries", type=Path, required=True)
+    compare.add_argument("--image-root", type=Path, required=True)
+    compare.add_argument("--output", type=Path, required=True)
+    compare.add_argument("--split", choices=["dev", "test"], action="append")
+    compare.add_argument("--k", type=int, default=3)
+    compare.add_argument("--device", default="cpu")
     evaluate = sub.add_parser("evaluate", help="Run held-out retrieval evaluation")
     source = evaluate.add_mutually_exclusive_group(required=True)
     source.add_argument("--catalog", type=Path)
@@ -104,7 +118,16 @@ def main(argv=None):
     publish.add_argument("--wait", action="store_true")
     publish.add_argument("--timeout", type=int, default=600)
     args = parser.parse_args(argv)
-    if args.command == "publish-space":
+    if args.command == "compare":
+        from .experiments import compare_indexes
+        if args.output.exists():
+            raise ValueError("Comparison output already exists; choose a new version")
+        report = compare_indexes(args.index, args.queries, args.image_root,
+                                 splits=tuple(args.split or ["dev", "test"]), k=args.k, device=args.device)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps({"output": str(args.output), "indexes": list(report["indexes"])}, indent=2))
+    elif args.command == "publish-space":
         from .publishing import publish_space
         print(json.dumps(publish_space(args.source, args.space_id, args.source_commit,
                                        wait=args.wait, timeout=args.timeout), indent=2))
@@ -145,7 +168,8 @@ def main(argv=None):
         from .index import VectorIndex
         products = load_catalog(args.catalog, args.image_root)
         encoder = ClipEncoder(device=args.device, text_revision=args.text_revision,
-                              image_revision=args.image_revision)
+                              image_revision=args.image_revision, semantic_text=args.semantic_text,
+                              semantic_revision=args.semantic_revision, semantic_model=args.semantic_model)
         index = VectorIndex.build(products, args.image_root, encoder)
         index.save(args.output)
         print(json.dumps(index.metadata, indent=2))

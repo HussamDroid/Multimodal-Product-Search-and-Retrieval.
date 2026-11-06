@@ -15,12 +15,21 @@ from .encoders import Encoder, normalize
 
 
 class VectorIndex:
-    def __init__(self, products, text_vectors, image_vectors, has_image, metadata):
+    def __init__(self, products, text_vectors, image_vectors, has_image, metadata, semantic_vectors=None):
         self.products = products
         self.text_vectors = normalize(text_vectors)
         self.image_vectors = normalize(image_vectors)
         self.has_image = np.asarray(has_image, dtype=bool)
         self.metadata = metadata
+        self.semantic_vectors = normalize(semantic_vectors) if semantic_vectors is not None else None
+        if self.semantic_vectors is not None:
+            if (self.semantic_vectors.shape[0] != len(products) or self.semantic_vectors.shape[1] == 0
+                    or (np.linalg.norm(self.semantic_vectors, axis=1) == 0).any()):
+                raise ValueError("Semantic vectors must have one nonzero row per product")
+            if not metadata.get("encoder", {}).get("semantic_model") or metadata.get("schema_version") != 2:
+                raise ValueError("Semantic vectors require version 2 encoder provenance")
+        elif metadata.get("schema_version") == 2:
+            raise ValueError("Version 2 index is missing semantic vectors")
         shape = self.text_vectors.shape
         if (shape[0] != len(products) or shape[1] == 0 or self.image_vectors.shape != shape
                 or self.has_image.shape != (len(products),)):
@@ -40,12 +49,14 @@ class VectorIndex:
         paths = [resolve_image(image_root, products[i].image) for i in present]
         if paths:
             image_vectors[present] = normalize(encoder.images(paths))
-        metadata = {"schema_version": 1, "built_at": datetime.now(timezone.utc).isoformat(),
+        semantic = (normalize(encoder.semantic_documents([p.text for p in products]))
+                    if encoder.identity.get("semantic_model") else None)
+        metadata = {"schema_version": 2 if semantic is not None else 1, "built_at": datetime.now(timezone.utc).isoformat(),
                     "catalog_sha256": fingerprint(products), "encoder": encoder.identity,
                     "image_sha256": {products[i].product_id: hashlib.sha256(path.read_bytes()).hexdigest()
                                      for i, path in zip(present, paths)}}
         return cls(products, text_vectors, image_vectors,
-                   np.array([bool(p.image) for p in products]), metadata)
+                   np.array([bool(p.image) for p in products]), metadata, semantic)
 
     def save(self, directory: Path):
         if directory.exists():
@@ -53,8 +64,10 @@ class VectorIndex:
         directory.parent.mkdir(parents=True, exist_ok=True)
         temp = Path(tempfile.mkdtemp(prefix=".souqlens-", dir=directory.parent))
         try:
-            np.savez_compressed(temp / "vectors.npz", text=self.text_vectors,
-                                image=self.image_vectors, has_image=self.has_image)
+            arrays = dict(text=self.text_vectors, image=self.image_vectors, has_image=self.has_image)
+            if self.semantic_vectors is not None:
+                arrays["semantic"] = self.semantic_vectors
+            np.savez_compressed(temp / "vectors.npz", **arrays)
             manifest = {**self.metadata, "products": [asdict(p) for p in self.products],
                         "vectors_sha256": hashlib.sha256((temp / "vectors.npz").read_bytes()).hexdigest()}
             (temp / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -66,7 +79,7 @@ class VectorIndex:
     @classmethod
     def load(cls, directory: Path):
         meta = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
-        if meta.get("schema_version") != 1:
+        if meta.get("schema_version") not in {1, 2}:
             raise ValueError("Unsupported index schema")
         if hashlib.sha256((directory / "vectors.npz").read_bytes()).hexdigest() != meta["vectors_sha256"]:
             raise ValueError("Vector checksum does not match the manifest")
@@ -74,4 +87,5 @@ class VectorIndex:
         if fingerprint(products) != meta["catalog_sha256"]:
             raise ValueError("Catalog checksum does not match the manifest")
         with np.load(directory / "vectors.npz", allow_pickle=False) as data:
-            return cls(products, data["text"], data["image"], data["has_image"], meta)
+            return cls(products, data["text"], data["image"], data["has_image"], meta,
+                       data["semantic"] if "semantic" in data else None)

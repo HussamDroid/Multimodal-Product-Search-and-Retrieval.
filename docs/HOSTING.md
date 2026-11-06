@@ -79,7 +79,7 @@ Point the host's authenticated HTTPS reverse proxy at port 7860. The app itself 
 
 ## Verification status
 
-Importer, bundle validation and source-only staging have automated tests. The hosted Dockerfile has not been built in this workspace because Docker is unavailable. No real catalog has been supplied for this deployment, and no hosting account has been selected or changed. There is no live real-product URL yet.
+Importer, bundle validation and source-only staging have automated tests. The hosted Dockerfile has not been built in this workspace because Docker is unavailable. The owner supplied a Black Rose catalog and images, uploaded a private dataset and connected the ZeroGPU Space. Text and indexed/new-photo searches were verified by the owner on the 18-product deployment. The E5 candidate bundle was prepared offline and requires a dataset revision update before its text encoder becomes active. See TEXT_RETRIEVAL.md for the draft comparison and its limits.
 
 Official references:
 

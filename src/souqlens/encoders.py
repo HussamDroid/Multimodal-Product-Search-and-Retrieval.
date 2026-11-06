@@ -10,6 +10,7 @@ from PIL import Image, ImageOps
 
 TEXT_MODEL = "sentence-transformers/clip-ViT-B-32-multilingual-v1"
 IMAGE_MODEL = "sentence-transformers/clip-ViT-B-32"
+SEMANTIC_MODEL = "intfloat/multilingual-e5-small"
 
 
 class Encoder(Protocol):
@@ -28,7 +29,10 @@ def normalize(vectors: np.ndarray) -> np.ndarray:
 
 
 class ClipEncoder:
-    def __init__(self, *, device="cpu", text_revision=None, image_revision=None, batch_size=16):
+    def __init__(self, *, device="cpu", text_revision=None, image_revision=None, batch_size=16,
+                 semantic_text=False, semantic_revision=None, semantic_model=SEMANTIC_MODEL):
+        if semantic_text and semantic_model not in {SEMANTIC_MODEL, "intfloat/multilingual-e5-base"}:
+            raise ValueError("Unsupported semantic text model")
         try:
             from sentence_transformers import SentenceTransformer
         except ImportError as error:
@@ -50,9 +54,29 @@ class ClipEncoder:
         self.image_model = SentenceTransformer(IMAGE_MODEL, revision=image_revision, device=device,
                                                 trust_remote_code=False)
 
+        self.semantic_model = None
+        if semantic_text:
+            semantic_revision = pinned(semantic_model, semantic_revision)
+            self._identity.update(semantic_model=semantic_model, semantic_revision=semantic_revision,
+                                  semantic_recipe="full-product-text-v1")
+            self.semantic_model = SentenceTransformer(semantic_model, revision=semantic_revision,
+                                                      device=device, trust_remote_code=False)
+
     @property
     def identity(self):
         return dict(self._identity)
+
+    def semantic_queries(self, texts):
+        return self._semantic_encode(texts, "query: ")
+
+    def semantic_documents(self, texts):
+        return self._semantic_encode(texts, "passage: ")
+
+    def _semantic_encode(self, texts, prefix):
+        if self.semantic_model is None:
+            raise ValueError("No dedicated text encoder configured")
+        return normalize(self.semantic_model.encode([prefix + text for text in texts],
+            batch_size=self.batch_size, convert_to_numpy=True, show_progress_bar=False))
 
     def text(self, texts):
         return normalize(self.text_model.encode(texts, batch_size=self.batch_size,

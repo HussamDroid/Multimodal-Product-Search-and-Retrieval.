@@ -78,18 +78,27 @@ class SearchEngine:
         dense = np.zeros(len(self.products), dtype=np.float32)
         if mode != "bm25":
             encoder = self._encoder()
+            semantic_text = bool(text and self.index.semantic_vectors is not None)
             vector = None
-            if text:
+            if text and not semantic_text:
                 vector = encoder.text([text])
             if image is not None:
                 picture = encoder.images([image])
                 vector = picture if vector is None else image_weight * picture + (1-image_weight) * vector
-            vector = normalize(vector)
-            if vector.shape != (1, self.index.text_vectors.shape[1]) or np.linalg.norm(vector) == 0:
-                raise ValueError("Query embedding has an invalid shape or zero norm")
-            text_score = self.index.text_vectors @ vector[0]
-            image_score = self.index.image_vectors @ vector[0]
-            dense = np.where(self.index.has_image, (text_score + image_score) / 2, text_score)
+            if vector is not None:
+                vector = normalize(vector)
+                if vector.shape != (1, self.index.text_vectors.shape[1]) or np.linalg.norm(vector) == 0:
+                    raise ValueError("Query embedding has an invalid shape or zero norm")
+                text_score = self.index.text_vectors @ vector[0]
+                image_score = self.index.image_vectors @ vector[0]
+                dense = np.where(self.index.has_image, (text_score + image_score) / 2, text_score)
+            if semantic_text:
+                query = normalize(encoder.semantic_queries([text]))
+                if query.shape != (1, self.index.semantic_vectors.shape[1]) or np.linalg.norm(query) == 0:
+                    raise ValueError("Semantic query embedding has an invalid shape or zero norm")
+                semantic = self.index.semantic_vectors @ query[0]
+                # Each tower stays in its own embedding space; only scalar scores are combined.
+                dense = image_weight * dense + (1-image_weight) * semantic if image is not None else semantic
         order = lambda scores, positive=False: sorted(
             (i for i in eligible if not positive or scores[i] > 0),
             key=lambda i: (-float(scores[i]), self.products[i].product_id))[:candidate_k]
