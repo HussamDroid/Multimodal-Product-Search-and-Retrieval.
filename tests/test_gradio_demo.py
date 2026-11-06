@@ -44,3 +44,23 @@ class GradioDemoTests(unittest.TestCase):
     def test_gradio_setup_and_configured_layouts_construct(self):
         self.assertIsNotNone(create_demo())
         self.assertIsNotNone(create_demo(DemoService(fixture(), Path("."))))
+
+    @unittest.skipUnless(importlib.util.find_spec("gradio"), "Gradio extra not installed")
+    def test_rendered_default_prices_include_the_full_catalog(self):
+        service = DemoService(fixture(), Path("."))
+        demo = create_demo(service)
+        components = demo.get_config_file()["components"]
+        prices = {c["props"]["label"]: c["props"]["value"] for c in components
+                  if c.get("props", {}).get("label") in {"Minimum price QAR", "Maximum price QAR"}}
+        minimum, maximum = prices["Minimum price QAR"], prices["Maximum price QAR"]
+        constraints = service.validate("jar", None, "bm25", minimum, maximum, False,
+                                       "All categories", False, 5)
+        self.assertTrue(all(constraints.allows(p) for p in service.engine.products))
+        _, rows, summary = service.search("jar", None, "bm25", minimum, maximum, False,
+                                          "All categories", False, 5)
+        self.assertTrue(rows)
+        self.assertIn(f"{len(service.engine.products)} eligible products", summary)
+        # An explicitly entered zero maximum must still filter out paid products.
+        constraints = service.validate("jar", None, "bm25", 0, 0, False,
+                                       "All categories", False, 5)
+        self.assertFalse(any(constraints.allows(p) for p in service.engine.products if p.price > 0))

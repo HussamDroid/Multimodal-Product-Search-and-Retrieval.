@@ -63,6 +63,7 @@ def load_service(device="cpu", environ=None):
 
 def create_demo(service=None, semantic_search=None):
     import gradio as gr
+    maximum_catalog_price = max((p.price for p in service.engine.products), default=0) if service else 0
     categories = sorted({p.category for p in service.engine.products if p.category}) if service else []
 
     def dispatch(text, image, mode, minimum, maximum, stock, category, rerank, count):
@@ -92,8 +93,9 @@ def create_demo(service=None, semantic_search=None):
                 mode = gr.Dropdown(choices=[("Hybrid", "hybrid"), ("Dense", "dense"), ("BM25 baseline", "bm25")],
                                    value="hybrid", label="Retrieval method")
                 with gr.Row():
-                    minimum = gr.Number(value=None, label="Minimum price QAR", minimum=0)
-                    maximum = gr.Number(value=None, label="Maximum price QAR", minimum=0)
+                    minimum = gr.Number(value=0, label="Minimum price QAR", minimum=0)
+                    # Explicit bounds keep the initial search inclusive when the browser sends zero for an empty number.
+                    maximum = gr.Number(value=maximum_catalog_price, label="Maximum price QAR", minimum=0)
                 category = gr.Dropdown(choices=["All categories"]+categories,
                                        value="All categories", label="Category")
                 stock = gr.Checkbox(label="In-stock products only")
