@@ -20,6 +20,7 @@ The focus is on measurable retrieval behavior: which products are returned, how 
 | 10. Runtime verification | Deployment waits for the uploaded Space commit to reach RUNNING and reports startup failures |
 | 11. Private build diagnostics | Read-only GitHub workflow retrieves Space build logs with token redaction |
 | 12. Space build packaging | Explicit runtime dependencies and source-path bootstrap support the hosted build order |
+| 13. OpenCart real-data adapter | Image-backed subset selection, barcode IDs, explicit duplicate policy and row-level conflict reporting |
 
 The pretrained encoders have been executed on CPU, including real image/text indexing, retrieval, reranker training and API inference on the sample fixtures. No real-catalog quality or business-impact result is claimed.
 

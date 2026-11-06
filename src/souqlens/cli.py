@@ -78,6 +78,12 @@ def main(argv=None):
     prepare.add_argument("--image-root", type=Path, required=True)
     prepare.add_argument("--mapping", type=Path)
     prepare.add_argument("--sheet")
+    opencart = sub.add_parser("prepare-opencart", help="Prepare the supplied-image subset of an OpenCart master")
+    opencart.add_argument("--source", type=Path, required=True)
+    opencart.add_argument("--output", type=Path, required=True)
+    opencart.add_argument("--image-root", type=Path, required=True)
+    opencart.add_argument("--duplicates", choices=["first", "last", "error"], required=True)
+    opencart.add_argument("--sheet")
     bundle = sub.add_parser("export-bundle", help="Package a validated index and its images for hosting")
     bundle.add_argument("--index", type=Path, required=True)
     bundle.add_argument("--image-root", type=Path, required=True)
@@ -115,6 +121,11 @@ def main(argv=None):
     elif args.command == "export-bundle":
         from .hosting import export_bundle
         print(json.dumps(export_bundle(args.index, args.image_root, args.output, args.ranker), indent=2))
+    elif args.command == "prepare-opencart":
+        from .opencart import prepare_opencart
+        print(json.dumps(prepare_opencart(args.source, args.output, args.image_root,
+                                         duplicates=args.duplicates, sheet=args.sheet),
+                         ensure_ascii=False, indent=2))
     elif args.command == "prepare-catalog":
         from .importer import prepare_catalog
         mapping = json.loads(args.mapping.read_text(encoding="utf-8")) if args.mapping else None
